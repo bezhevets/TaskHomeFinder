@@ -39,11 +39,11 @@ class PropertiesLinksScraper:
                     result = await self.get_properties_links(
                         session, f"{region_link}{index}"
                     )
-                    a = 0
+                    count_duplicate_links = 0
                     for el in result:
                         if el in results["For Buy"] or el in results["For Rent"]:
-                            a += 1
-                    if len(result) == a:
+                            count_duplicate_links += 1
+                    if len(result) == count_duplicate_links:
                         break
                     if "buy" in region_link:
                         results["For Buy"] += result
