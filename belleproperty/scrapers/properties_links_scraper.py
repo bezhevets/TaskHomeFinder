@@ -33,7 +33,7 @@ class PropertiesLinksScraper:
         async with aiohttp.ClientSession(headers=self.headers) as session:
             for region_link in BASE_SEARCH_URLS:
                 index = 1
-                while index <= 10:
+                while True:
                     result = await self.get_properties_links(
                         session, f"{region_link}{index}"
                     )
