@@ -35,7 +35,11 @@ class PropertyCardScraper:
 
     @staticmethod
     def get_property_price(soup: BeautifulSoup) -> str | None:
-        return soup.select_one('div[class="price"]').text.strip()
+        try:
+            price = soup.select_one('div[class="price"]').text.strip()
+            return price
+        except AttributeError:
+            return None
 
     @staticmethod
     def get_property_images(soup: BeautifulSoup) -> list[str]:
@@ -44,8 +48,12 @@ class PropertyCardScraper:
 
     @staticmethod
     def get_property_info(soup: BeautifulSoup) -> dict:
-        block_property_type = soup.find("div", {"class": "property-info"})
-        all_item = block_property_type.find_all("div", {"class": "item"})
+        try:
+            block_property_type = soup.find("div", {"class": "property-info"})
+
+            all_item = block_property_type.find_all("div", {"class": "item"})
+        except AttributeError:
+            return {}
         result = {
             item.find("div", {"class": "label"})
             .text: item.find("div", {"class": "value"})

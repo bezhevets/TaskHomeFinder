@@ -32,11 +32,14 @@ class PropertiesScraper(PropertyCardScraper):
         async with aiohttp.ClientSession(headers=headers) as session:
             results = []
             for key, list_links in properties_links.items():
-                tasks = [
-                    self.create_property_instance(session, property_link, key)
-                    for property_link in list_links
-                ]
-                results += await asyncio.gather(*tasks)
+                step = 20
+                for i in range(0, len(list_links), step):
+                    tasks = [
+                        self.create_property_instance(session, property_link, key)
+                        for property_link in list_links[i : i + step]
+                    ]
+                    results += await asyncio.gather(*tasks)
+                    await asyncio.sleep(0.1)
             return results
 
     def scrape_properties(self, properties_links: dict):

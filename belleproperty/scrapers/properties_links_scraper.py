@@ -29,7 +29,7 @@ class PropertiesLinksScraper:
         return []
 
     async def create_coroutines(self) -> dict:
-        results = {}
+        results = {"For Buy": [], "For Rent": []}
         async with aiohttp.ClientSession(headers=self.headers) as session:
             for region_link in BASE_SEARCH_URLS:
                 index = 1
@@ -41,11 +41,11 @@ class PropertiesLinksScraper:
                     if not result:
                         break
                     if "buy" in region_link:
-                        results["For Buy"] = [
+                        results["For Buy"] += [
                             link for link in result if link != BASE_URL[:-1] + "#"
                         ]
                     if "rent" in region_link:
-                        results["For Rent"] = [
+                        results["For Rent"] += [
                             link for link in result if link != BASE_URL[:-1] + "#"
                         ]
 
