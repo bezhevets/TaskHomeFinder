@@ -40,12 +40,6 @@ class PropertiesLinksScraper:
                         )
                     if not result:
                         break
-                    # count_duplicate_links = 0
-                    # for el in result:
-                    #     if el in results:
-                    #         count_duplicate_links += 1
-                    # if len(result) == count_duplicate_links:
-                    #     break
                     results += result
 
                     index += 1
