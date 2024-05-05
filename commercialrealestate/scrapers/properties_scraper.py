@@ -11,6 +11,13 @@ from .property_card_scraper import PropertyCardScraper
 
 class PropertiesScraper(PropertyCardScraper):
 
+    async def actual_properties(self, properties: list[Property]) -> list[Property]:
+        results = []
+        for _property in properties:
+            if _property.property_type:
+                results.append(_property)
+        return results
+
     async def create_property_instance(self, session, property_link: str) -> Property:
         text_response = await session.get(property_link, timeout=TIMEOUT)
         soup = BeautifulSoup(text_response.content, "html.parser")
@@ -30,8 +37,9 @@ class PropertiesScraper(PropertyCardScraper):
                     for property_link in properties_links[i : i + step]
                 ]
                 results += await asyncio.gather(*tasks)
-                await asyncio.sleep(0.5)
-        return results
+                await asyncio.sleep(1)
+        actual_properties = await self.actual_properties(results)
+        return actual_properties
 
     def scrape_properties(self, properties_links: list):
         return asyncio.run(self.create_coroutines(properties_links=properties_links))
