@@ -43,8 +43,13 @@ class PropertyCardScraper:
 
     @staticmethod
     def get_property_images(soup: BeautifulSoup) -> list[str]:
-        containers = soup.find_all("div", {"class": "hero-item"})
-        return list(set(image_url.get("data-swiper-image") for image_url in containers))
+        try:
+            containers = soup.find_all("div", {"class": "hero-item"})
+            return list(
+                set(image_url.get("data-swiper-image") for image_url in containers)
+            )
+        except AttributeError:
+            return []
 
     @staticmethod
     def get_property_info(soup: BeautifulSoup) -> dict:
@@ -64,13 +69,16 @@ class PropertyCardScraper:
 
     @staticmethod
     def get_property_features(soup: BeautifulSoup) -> int:
-        features = soup.find_all("div", {"class": "feature"})
-        rooms = 0
-        for feature in features:
-            feature_text = feature.text
-            if feature_text.isdigit():
-                rooms += int(feature_text)
-        return rooms
+        try:
+            features = soup.find_all("div", {"class": "feature"})
+            rooms = 0
+            for feature in features:
+                feature_text = feature.text
+                if feature_text.isdigit():
+                    rooms += int(feature_text)
+            return rooms
+        except AttributeError:
+            return 0
 
     def get_property_data(self, soup: BeautifulSoup) -> dict:
         address = self.get_property_address(soup)
