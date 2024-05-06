@@ -65,19 +65,22 @@ class PropertyCardScraper:
         return list(set(image_url.get("data-swiper-image") for image_url in containers))
 
     @staticmethod
-    def get_property_type(soup: BeautifulSoup) -> str:
-        block_property_type = soup.find(
-            "div",
-            {
-                "class": "Descriptionsstyled__AboutSectionContentWrapper-sc-1hf9zfm-10 jrmxSX"
-            },
-        )
-        all_item = block_property_type.find_all(
-            "li", {"class": "Descriptionsstyled__ListItem-sc-1hf9zfm-2 kORMIG"}
-        )
-        pattern = r"Property type(\S+)"
-        property_type = PropertyCardScraper.find_info(pattern, all_item)
-        return property_type
+    def get_property_type(soup: BeautifulSoup) -> str | None:
+        try:
+            block_property_type = soup.find(
+                "div",
+                {
+                    "class": "Descriptionsstyled__AboutSectionContentWrapper-sc-1hf9zfm-10 jrmxSX"
+                },
+            )
+            all_item = block_property_type.find_all(
+                "li", {"class": "Descriptionsstyled__ListItem-sc-1hf9zfm-2 kORMIG"}
+            )
+            pattern = r"Property type(\S+)"
+            property_type = PropertyCardScraper.find_info(pattern, all_item)
+            return property_type
+        except AttributeError:
+            return None
 
     @staticmethod
     def get_property_features(soup: BeautifulSoup) -> int:

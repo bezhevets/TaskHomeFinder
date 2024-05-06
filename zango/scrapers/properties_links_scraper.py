@@ -17,14 +17,19 @@ class PropertiesLinksScraper:
             return await response.text()
 
     async def get_properties_links(self, session, page_link) -> list[str] | None:
-        text_response = await self.fetch_url_content(session, page_link)
+        try:
+            text_response = await self.fetch_url_content(session, page_link)
+        except asyncio.TimeoutError:
+            return []
+
         soup = BeautifulSoup(text_response, "html.parser")
 
         containers = soup.find_all(
             "a", {"class": "PropertyLinkstyled__SLink-sc-lm9gjx-0 dCVOWP"}
         )
+
         if not containers:
-            return None
+            return []
         links = [container.get("href") for container in containers]
         if links:
             return [BASE_URL[:-1] + link for link in links]
