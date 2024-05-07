@@ -1,3 +1,4 @@
+import json
 import re
 
 from bs4 import BeautifulSoup
@@ -59,10 +60,17 @@ class PropertyCardScraper:
             return None
 
     @staticmethod
-    def get_property_images(soup: BeautifulSoup) -> list[str]:
-        containers = soup.find("div", {"class": "slider-wrapper axis-horizontal"})
-
-        return list(set(image_url.get("data-swiper-image") for image_url in containers))
+    def get_property_images(soup: BeautifulSoup) -> list:
+        containers = soup.find("script", {"id": "__NEXT_DATA__"})
+        if containers:
+            json_data = json.loads(containers.text)
+            try:
+                images = json_data["props"]["pageProps"]["property"]["images"]
+                res = [img["image"]["image"] for img in images]
+                return res
+            except KeyError:
+                return []
+        return []
 
     @staticmethod
     def get_property_type(soup: BeautifulSoup) -> str | None:
@@ -84,10 +92,14 @@ class PropertyCardScraper:
 
     @staticmethod
     def get_property_features(soup: BeautifulSoup) -> int:
-        features_container = soup.find(
-            "div", {"class": "PriceBlockstyled__DetailGroup-sc-19x5iq3-9 zroeH"}
-        )
-        features = features_container.find_all("span")
+        try:
+            features_container = soup.find(
+                "div", {"class": "PriceBlockstyled__DetailGroup-sc-19x5iq3-9 zroeH"}
+            )
+            features = features_container.find_all("span")
+        except AttributeError:
+            return 0
+
         rooms = 0
         for feature in features:
             feature_text = feature.text[0]
@@ -116,7 +128,7 @@ class PropertyCardScraper:
             "address": address,
             "region": self.get_property_region(address),
             "description": self.get_property_description(soup),
-            "pictures": [],
+            "pictures": self.get_property_images(soup),
             "price": self.get_property_price(soup),
             "rooms_cnt": self.get_property_features(soup),
             "area": self.get_property_area(soup),
